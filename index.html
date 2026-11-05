@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang web của Ngọc Thi</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      background: #ffe4ec url("nen.jpg") center / cover no-repeat fixed;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+    }
+
+    .khung {
+      background-color: rgba(255, 255, 255, 0.88);
+      width: 100%;
+      max-width: 440px;
+      padding: 24px 18px;
+      margin: 12px 0;
+      border-radius: 16px;
+      text-align: center;
+      transition: background-color 0.4s;
+    }
+
+    h1 { color: #8a2b4d; font-size: 24px; margin: 14px 0 8px; }
+    h2 { color: #8a2b4d; font-size: 20px; margin-top: 28px; }
+
+    #anh {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #e0507d;
+    }
+
+    #dongho { font-size: 34px; font-weight: bold; color: #8a2b4d; }
+    #ngay { color: #555; }
+
+    button {
+      background-color: #e0507d;
+      color: white;
+      border: none;
+      padding: 11px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 4px;
+    }
+    button:hover { background-color: #b93a63; }
+    button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+    /* Nút chọn chế độ */
+    .cheDo { background-color: #f3c4d3; color: #8a2b4d; }
+    .cheDo.dangChon { background-color: #e0507d; color: white; }
+
+    .nutPhu {
+      background: none;
+      color: #888;
+      font-size: 13px;
+      text-decoration: underline;
+      padding: 4px;
+    }
+    .nutPhu:hover { background: none; color: #555; }
+
+    input {
+      padding: 10px;
+      font-size: 16px; /* 16px để iPhone không tự phóng to khi bấm vào ô */
+      width: 120px;
+      border: 2px solid #e0507d;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    #loichao, #ketQua {
+      margin-top: 14px;
+      font-size: 18px;
+      color: #8a2b4d;
+    }
+
+    #luotCon { color: #555; margin: 6px 0; }
+
+    #kyLuc {
+      background-color: #fff4d6;
+      border-radius: 8px;
+      padding: 8px;
+      margin: 10px 0;
+      color: #7a5a00;
+      font-weight: bold;
+    }
+
+    #lichSu {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0;
+      font-size: 15px;
+      color: #444;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    #lichSu li {
+      background-color: #fff;
+      border-radius: 6px;
+      padding: 5px 10px;
+      margin: 4px 0;
+    }
+
+    /* Điện thoại màn hình nhỏ */
+    @media (max-width: 480px) {
+      .khung { padding: 20px 14px; }
+      h1 { font-size: 21px; }
+      #dongho { font-size: 28px; }
+      button { padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="khung" id="khung">
+
+    <img id="anh" src="anh.jpg" alt="Ảnh của Ngọc Thi" onerror="this.style.display='none'">
+
+    <h1>Xin chào, đây là trang web của Ngọc Thi!</h1>
+
+    <div id="dongho"></div>
+    <div id="ngay"></div>
+
+    <div style="margin-top: 16px;">
+      <button onclick="hienLoiChao()">Bấm vào tôi</button>
+      <button onclick="doiMauKhung()">Đổi màu khung</button>
+    </div>
+    <p id="loichao"></p>
+
+    <!-- Trò chơi đoán số -->
+    <h2>🎮 Trò chơi đoán số</h2>
+
+    <div>
+      <button class="cheDo dangChon" id="nutDe" onclick="chonCheDo('de')">Dễ: 1-100</button>
+      <button class="cheDo" id="nutKho" onclick="chonCheDo('kho')">Khó: 1-1000</button>
+    </div>
+
+    <p id="moTa"></p>
+    <div id="kyLuc"></div>
+
+    <input type="number" id="oSo" inputmode="numeric" placeholder="Nhập số">
+    <button id="nutDoan" onclick="doanSo()">Đoán</button>
+    <button onclick="choiLai()">Chơi lại</button>
+
+    <p id="luotCon"></p>
+    <p id="ketQua"></p>
+    <ul id="lichSu"></ul>
+
+    <button class="nutPhu" onclick="xoaKyLuc()">Xóa kỷ lục</button>
+
+  </div>
+
+  <script>
+    // ----- Lời chào -----
+    function hienLoiChao() {
+      document.getElementById("loichao").textContent =
+        "Chào Ngọc Thi! Chúc bạn học AI thật vui 🎉";
+    }
+
+    // ----- Đổi màu khung -----
+    var cacMau = ["#ffffff", "#ffe4ec", "#dff1ff", "#e3f9e5", "#fff4d6", "#ece4ff"];
+    var viTri = 0;
+    function doiMauKhung() {
+      viTri = (viTri + 1) % cacMau.length;
+      document.getElementById("khung").style.backgroundColor = cacMau[viTri];
+    }
+
+    // ----- Đồng hồ -----
+    function capNhatGio() {
+      var bayGio = new Date();
+      document.getElementById("dongho").textContent =
+        bayGio.toLocaleTimeString("vi-VN");
+      document.getElementById("ngay").textContent =
+        bayGio.toLocaleDateString("vi-VN", {
+          weekday: "long", day: "numeric", month: "numeric", year: "numeric"
+        });
+    }
+    capNhatGio();
+    setInterval(capNhatGio, 1000);
+
+    // ----- Âm thanh (tạo bằng code, không cần file) -----
+    function phatAmThanh(cacNot) {
+      try {
+        var AmCtx = window.AudioContext || window.webkitAudioContext;
+        var ctx = new AmCtx();
+        cacNot.forEach(function (tanSo, i) {
+          var dao = ctx.createOscillator();
+          var amLuong = ctx.createGain();
+          dao.type = "sine";
+          dao.frequency.value = tanSo;
+          dao.connect(amLuong);
+          amLuong.connect(ctx.destination);
+          var batDau = ctx.currentTime + i * 0.18;
+          amLuong.gain.setValueAtTime(0.25, batDau);
+          amLuong.gain.exponentialRampToValueAtTime(0.001, batDau + 0.3);
+          dao.start(batDau);
+          dao.stop(batDau + 0.3);
+        });
+      } catch (loi) {
+        // Trình duyệt không hỗ trợ âm thanh thì bỏ qua
+      }
+    }
+    function amThanhThang() { phatAmThanh([523, 659, 784, 1047]); }
+    function amThanhThua()  { phatAmThanh([330, 262]); }
+
+    // ----- Lưu kỷ lục (không mất khi tải lại trang) -----
+    function docKyLuc(khoa) {
+      try {
+        var giaTri = localStorage.getItem(khoa);
+        return giaTri === null ? null : Number(giaTri);
+      } catch (loi) {
+        return null;
+      }
+    }
+    function luuKyLuc(khoa, giaTri) {
+      try { localStorage.setItem(khoa, String(giaTri)); } catch (loi) {}
+    }
+    function xoaKyLuc() {
+      if (!confirm("Bạn chắc chắn muốn xóa kỷ lục ở cả hai chế độ?")) return;
+      try {
+        localStorage.removeItem("kyLucDe");
+        localStorage.removeItem("kyLucKho");
+      } catch (loi) {}
+      hienKyLuc();
+    }
+
+    // ----- Trò chơi đoán số -----
+    var cacCheDo = {
+      de:  { ten: "Dễ",  max: 100,  luot: 7,  khoa: "kyLucDe" },
+      kho: { ten: "Khó", max: 1000, luot: 10, khoa: "kyLucKho" }
+    };
+    var cheDoHienTai = "de";
+    var soBiMat, soLan, daKetThuc, lichSu;
+
+    function hienKyLuc() {
+      var cd = cacCheDo[cheDoHienTai];
+      var kl = docKyLuc(cd.khoa);
+      document.getElementById("kyLuc").textContent =
+        "🏆 Kỷ lục chế độ " + cd.ten + ": " +
+        (kl === null ? "chưa có" : kl + " lần");
+    }
+
+    function veLichSu() {
+      var ds = document.getElementById("lichSu");
+      ds.innerHTML = "";
+      lichSu.forEach(function (muc, i) {
+        var li = document.createElement("li");
+        li.textContent = "Lần " + (i + 1) + ": " + muc.so + " → " + muc.goiY;
+        ds.appendChild(li);
+      });
+      ds.scrollTop = ds.scrollHeight;
+    }
+
+    function ketThuc() {
+      daKetThuc = true;
+      document.getElementById("oSo").disabled = true;
+      document.getElementById("nutDoan").disabled = true;
+    }
+
+    function chonCheDo(ten) {
+      cheDoHienTai = ten;
+      document.getElementById("nutDe").classList.toggle("dangChon", ten === "de");
+      document.getElementById("nutKho").classList.toggle("dangChon", ten === "kho");
+      choiLai();
+    }
+
+    function choiLai() {
+      var cd = cacCheDo[cheDoHienTai];
+      soBiMat = Math.floor(Math.random() * cd.max) + 1;
+      soLan = 0;
+      daKetThuc = false;
+      lichSu = [];
+      veLichSu();
+
+      var o = document.getElementById("oSo");
+      o.disabled = false;
+      o.value = "";
+      o.min = 1;
+      o.max = cd.max;
+      document.getElementById("nutDoan").disabled = false;
+
+      document.getElementById("moTa").innerHTML =
+        "Tôi đang nghĩ một số từ 1 đến <b>" + cd.max + "</b>. Bạn có <b>" +
+        cd.luot + " lượt</b> để đoán!";
+      document.getElementById("luotCon").textContent = "Còn " + cd.luot + " lượt";
+      document.getElementById("ketQua").textContent = "Mời bạn đoán!";
+      hienKyLuc();
+    }
+
+    function doanSo() {
+      if (daKetThuc) return;
+
+      var cd = cacCheDo[cheDoHienTai];
+      var o = document.getElementById("oSo");
+      var ketQua = document.getElementById("ketQua");
+      var so = Number(o.value);
+
+      if (o.value === "" || !Number.isInteger(so) || so < 1 || so > cd.max) {
+        ketQua.textContent = "Hãy nhập một số nguyên từ 1 đến " + cd.max + " nhé!";
+        return;
+      }
+
+      soLan = soLan + 1;
+      var goiY;
+
+      if (so === soBiMat) {
+        goiY = "đúng rồi! 🎉";
+        var kl = docKyLuc(cd.khoa);
+        if (kl === null || soLan < kl) {
+          luuKyLuc(cd.khoa, soLan);
+          ketQua.textContent = "🎉 Chính xác sau " + soLan + " lần. KỶ LỤC MỚI! 🏆";
+        } else {
+          ketQua.textContent = "🎉 Chính xác! Bạn đoán đúng sau " + soLan + " lần.";
+        }
+        amThanhThang();
+        ketThuc();
+        hienKyLuc();
+      } else {
+        goiY = (so < soBiMat) ? "nhỏ quá" : "lớn quá";
+        if (soLan >= cd.luot) {
+          ketQua.textContent = "😢 Hết lượt rồi! Số bí mật là " + soBiMat + ". Bấm Chơi lại nhé.";
+          amThanhThua();
+          ketThuc();
+        } else {
+          ketQua.textContent = "Số bạn đoán " + goiY + ", thử lại nhé!";
+        }
+      }
+
+      lichSu.push({ so: so, goiY: goiY });
+      veLichSu();
+      document.getElementById("luotCon").textContent =
+        "Còn " + (cd.luot - soLan) + " lượt";
+
+      o.value = "";
+      if (!daKetThuc) o.focus();
+    }
+
+    // Nhấn Enter trong ô nhập cũng là đoán
+    document.getElementById("oSo").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") doanSo();
+    });
+
+    // Bắt đầu ván đầu tiên
+    choiLai();
+  </script>
+</body>
+</html>
